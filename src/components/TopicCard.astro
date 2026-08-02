@@ -121,9 +121,18 @@ const maxGamma = topic.articles.length > 0 ? Math.max(...topic.articles.map((a) 
             </div>
 
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs mb-2.5">
-              <span class="font-mono text-orange bg-orange/10 px-2 py-0.5 rounded-md font-medium" title="Relevance probability: gamma score">
-                γ {article.gamma.toFixed(3)}
-              </span>
+              <div
+                class="inline-flex items-center gap-1.5 font-mono text-orange bg-orange/10 px-2 py-0.5 rounded-md font-medium"
+                title={`Topic relevance probability: γ = ${article.gamma.toFixed(4)} (${(article.gamma * 100).toFixed(1)}%)`}
+              >
+                <span>γ {article.gamma.toFixed(3)}</span>
+                <div class="w-10 h-1.5 bg-orange/20 rounded-full overflow-hidden inline-flex">
+                  <div
+                    class="h-full bg-orange rounded-full"
+                    style={`width: ${Math.min(100, Math.max(5, article.gamma * 100))}%`}
+                  ></div>
+                </div>
+              </div>
               <span class="px-2 py-0.5 rounded-md bg-gray-100 text-body/70 font-medium font-mono">
                 {article.year}
               </span>

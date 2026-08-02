@@ -84,6 +84,32 @@ const maxGamma = topic.articles.length > 0 ? Math.max(...topic.articles.map((a) 
   </button>
 
   <div id={panelId} class="hidden border-t border-gray-100 bg-offwhite/50" data-accordion-panel>
+    <!-- Topic Action Subheader -->
+    <div class="px-5 py-2.5 bg-gray-50/90 border-b border-gray-200/70 flex flex-wrap items-center justify-between gap-2 text-xs">
+      <span class="text-body/60 font-medium">
+        {topic.articles.length} representative paper{topic.articles.length !== 1 ? "s" : ""} sorted by γ score
+      </span>
+      <button
+        type="button"
+        data-copy-topic-citations={JSON.stringify({
+          topic: topic.topicLabel,
+          papers: topic.articles.map((a) => ({
+            title: a.title,
+            year: a.year,
+            gamma: a.gamma,
+            country: a.country,
+          })),
+        })}
+        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-gray-200 text-body/80 hover:text-navy hover:border-orange hover:bg-orange/5 transition-all cursor-pointer font-medium shadow-2xs"
+        title="Copy topic bibliography summary to clipboard"
+      >
+        <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+        </svg>
+        <span class="topic-cite-label">Copy Bibliography</span>
+      </button>
+    </div>
+
     <ul class="divide-y divide-gray-100">
       {topic.articles.map((article, aIdx) => {
         const scholarUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(article.title)}`;
@@ -224,7 +250,7 @@ const maxGamma = topic.articles.length > 0 ? Math.max(...topic.articles.map((a) 
     });
   });
 
-  // Copy title button
+  // Copy individual title button
   document.querySelectorAll<HTMLButtonElement>("[data-copy-title]").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const textToCopy = btn.dataset.copyTitle;
@@ -244,6 +270,40 @@ const maxGamma = topic.articles.length > 0 ? Math.max(...topic.articles.map((a) 
         }
       } catch (err) {
         console.error("Clipboard copy failed", err);
+      }
+    });
+  });
+
+  // Copy whole topic bibliography
+  document.querySelectorAll<HTMLButtonElement>("[data-copy-topic-citations]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const rawData = btn.dataset.copyTopicCitations;
+      const label = btn.querySelector<HTMLSpanElement>(".topic-cite-label");
+      if (!rawData) return;
+
+      try {
+        const parsed = JSON.parse(rawData);
+        const lines = [
+          `### Topic: ${parsed.topic}`,
+          "",
+          ...parsed.papers.map(
+            (p: { title: string; year: string; gamma: number; country?: string }, idx: number) =>
+              `${idx + 1}. "${p.title}" (${p.year})${p.country ? ` [${p.country}]` : ""} — γ: ${p.gamma.toFixed(3)}`
+          ),
+        ];
+        await navigator.clipboard.writeText(lines.join("\n"));
+
+        if (label) {
+          const original = label.textContent;
+          label.textContent = "Copied Bibliography! ✓";
+          btn.classList.add("bg-emerald-100", "text-emerald-800", "border-emerald-300");
+          setTimeout(() => {
+            label.textContent = original;
+            btn.classList.remove("bg-emerald-100", "text-emerald-800", "border-emerald-300");
+          }, 2000);
+        }
+      } catch (err) {
+        console.error("Bibliography copy failed", err);
       }
     });
   });

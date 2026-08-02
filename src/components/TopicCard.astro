@@ -32,6 +32,8 @@ const maxGamma = topic.articles.length > 0 ? Math.max(...topic.articles.map((a) 
   data-topic-label={topic.topicLabel.toLowerCase()}
   data-article-count={topic.articleCount}
   data-max-gamma={maxGamma}
+  data-years={topic.articles.map((a) => a.year).join(",")}
+  data-has-high-gamma={topic.articles.some((a) => a.gamma >= 0.9) ? "true" : "false"}
   data-search-text={`${topic.topicLabel} ${topic.articles.map((a) => `${a.title} ${a.year} ${a.country || ""} ${a.abstract}`).join(" ")}`.toLowerCase()}
 >
   <button

@@ -1,0 +1,305 @@
+---
+import "../styles/global.css";
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description || "GammaSort — Topic modeling explorer of US and Chinese academic papers"} />
+
+    <title>{title} | GammaSort</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body id="top" class="flex flex-col min-h-screen">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-navy focus:text-white focus:px-4 focus:py-2 focus:rounded shadow-lg">
+      Skip to main content
+    </a>
+
+    <header class="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40 transition-all">
+      <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+        <div class="flex items-center justify-between h-16">
+          <a href="#top" id="brand-link" class="flex items-center gap-2.5 group cursor-pointer" title="GammaSort Home">
+            <span class="w-8 h-8 rounded-lg bg-navy flex items-center justify-center text-orange font-mono font-bold text-lg shadow-sm group-hover:bg-orange group-hover:text-white transition-colors">
+              γ
+            </span>
+            <div>
+              <span class="text-xl font-bold text-navy tracking-tight group-hover:text-orange transition-colors">GammaSort</span>
+              <span class="hidden sm:inline-block ml-2 text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">US · CN Academic Topics</span>
+            </div>
+          </a>
+
+          <div class="flex items-center gap-1 sm:gap-2">
+            <button
+              type="button"
+              id="nav-home-btn"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium text-navy hover:text-orange hover:bg-orange/10 transition-colors cursor-pointer"
+            >
+              Home
+            </button>
+            <button
+              type="button"
+              id="open-methodology-btn"
+              class="px-3 py-1.5 rounded-lg text-sm font-medium text-body/80 hover:text-orange hover:bg-orange/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <svg class="w-4 h-4 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Methodology &amp; γ</span>
+            </button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content" class="flex-1">
+      <slot />
+    </main>
+
+    <!-- Methodology & Gamma Modal -->
+    <div
+      id="methodology-modal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-navy/60 backdrop-blur-xs hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div class="bg-white rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-gray-100 max-h-[90vh] overflow-y-auto transform transition-all">
+        <div class="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
+          <div class="flex items-center gap-3">
+            <span class="w-9 h-9 rounded-lg bg-orange/10 text-orange flex items-center justify-center font-mono font-bold text-xl">
+              γ
+            </span>
+            <div>
+              <h2 id="modal-title" class="text-xl font-bold text-navy">About GammaSort &amp; Methodology</h2>
+              <p class="text-xs text-body/60 mt-0.5">Topic Modeling Explorer of US &amp; Chinese Academic Literature</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="close-methodology-btn"
+            class="p-2 rounded-lg text-gray-400 hover:text-navy hover:bg-gray-100 transition-colors cursor-pointer"
+            aria-label="Close modal"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-6 text-sm text-body/80 leading-relaxed">
+          <div class="bg-offwhite p-4 rounded-xl border border-gray-200/70">
+            <h3 class="font-semibold text-navy text-sm mb-1 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-orange"></span>
+              What is Gamma (γ)?
+            </h3>
+            <p>
+              In Latent Dirichlet Allocation (LDA) and topic modeling, <strong class="text-navy font-semibold">Gamma (γ)</strong> represents the <em>per-document-per-topic probability</em>: the proportion of a paper's content that belongs to a specific topic.
+            </p>
+            <p class="mt-2 text-xs text-body/60">
+              Values range from <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-gray-200 text-orange font-medium">0.000</code> to <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-gray-200 text-orange font-medium">1.000</code>. Articles in each topic are sorted by descending γ so the most representative papers appear first.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="font-semibold text-navy text-sm mb-2 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-navy"></span>
+              Corpus Categories
+            </h3>
+            <ul class="space-y-2.5 pl-1">
+              <li class="flex items-start gap-2">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 shrink-0 mt-0.5">Only US</span>
+                <span>Research topics extracted exclusively from American academic publications.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 shrink-0 mt-0.5">Only China</span>
+                <span>Research topics extracted exclusively from Chinese academic publications.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 shrink-0 mt-0.5">Both</span>
+                <span>Topics discovered across the combined comparative corpus with dual-country representation.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="font-semibold text-navy text-sm mb-2 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              Explorer Features
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div class="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+                <strong class="text-navy block mb-0.5">🔍 Scholar Search</strong>
+                Click the search icon on any paper to look it up directly on Google Scholar.
+              </div>
+              <div class="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+                <strong class="text-navy block mb-0.5">📋 Quick Copy</strong>
+                Copy paper titles and citations to clipboard in one click.
+              </div>
+              <div class="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+                <strong class="text-navy block mb-0.5">⚡ Expand All</strong>
+                Toggle all topic accordions at once for fast skimming.
+              </div>
+              <div class="p-2.5 rounded-lg bg-gray-50 border border-gray-100">
+                <strong class="text-navy block mb-0.5">🔎 Live Filter</strong>
+                Filter topics and abstracts instantaneously by keywords or years.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-100 flex justify-end">
+          <button
+            type="button"
+            id="close-methodology-btn-bottom"
+            class="px-5 py-2 rounded-lg bg-navy text-white text-sm font-medium hover:bg-navy-light transition-colors cursor-pointer"
+          >
+            Got it, thanks!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Scroll-to-Top Button -->
+    <button
+      type="button"
+      id="scroll-to-top-btn"
+      class="fixed bottom-6 right-6 z-40 p-3 rounded-full bg-navy text-white shadow-lg hover:bg-orange hover:scale-105 transition-all opacity-0 pointer-events-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange"
+      aria-label="Scroll back to top"
+      title="Back to top"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+      </svg>
+    </button>
+
+    <footer class="bg-navy text-white/80 mt-auto border-t border-navy-light">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mb-8 pb-8 border-b border-white/10">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-6 h-6 rounded bg-orange text-white font-mono font-bold text-xs flex items-center justify-center">γ</span>
+              <span class="text-base font-bold text-white tracking-tight">GammaSort</span>
+            </div>
+            <p class="text-xs text-white/60 leading-relaxed">
+              Interactive topic modeling explorer investigating comparative research patterns in US and Chinese academic literature.
+            </p>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-semibold text-white uppercase tracking-wider mb-3">Quick Navigation</h4>
+            <ul class="space-y-2 text-xs text-white/60">
+              <li><a href="#top" class="hover:text-white transition-colors">Top of Page</a></li>
+              <li><button type="button" id="footer-methodology-btn" class="hover:text-white transition-colors cursor-pointer text-left">Methodology &amp; Gamma (γ)</button></li>
+              <li><a href="#tab-navigation-root" class="hover:text-white transition-colors">Topic Categories</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-semibold text-white uppercase tracking-wider mb-3">Corpus Breakdown</h4>
+            <div class="space-y-1.5 text-xs text-white/60">
+              <div class="flex justify-between">
+                <span>US Corpus</span>
+                <span class="font-mono text-white/80">Only US Topics</span>
+              </div>
+              <div class="flex justify-between">
+                <span>China Corpus</span>
+                <span class="font-mono text-white/80">Only China Topics</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Combined Corpus</span>
+                <span class="font-mono text-white/80">Both US &amp; CN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
+          <p>&copy; {new Date().getFullYear()} GammaSort. Academic Topic Modeling Explorer.</p>
+          <p>Sorted by document relevance score (γ) in descending order.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Scroll to top button visibility & action
+      const scrollTopBtn = document.getElementById("scroll-to-top-btn");
+      const navHomeBtn = document.getElementById("nav-home-btn");
+      const brandLink = document.getElementById("brand-link");
+
+      function handleScroll() {
+        if (!scrollTopBtn) return;
+        if (window.scrollY > 280) {
+          scrollTopBtn.classList.remove("opacity-0", "pointer-events-none");
+          scrollTopBtn.classList.add("opacity-100", "pointer-events-auto");
+        } else {
+          scrollTopBtn.classList.add("opacity-0", "pointer-events-none");
+          scrollTopBtn.classList.remove("opacity-100", "pointer-events-auto");
+        }
+      }
+
+      window.addEventListener("scroll", handleScroll, { passive: true });
+
+      function scrollToTopSmooth() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      scrollTopBtn?.addEventListener("click", scrollToTopSmooth);
+      brandLink?.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopSmooth();
+      });
+      navHomeBtn?.addEventListener("click", (e) => {
+        e.preventDefault();
+        scrollToTopSmooth();
+      });
+
+      // Methodology Modal
+      const modal = document.getElementById("methodology-modal");
+      const openModalBtn = document.getElementById("open-methodology-btn");
+      const footerModalBtn = document.getElementById("footer-methodology-btn");
+      const closeModalBtn = document.getElementById("close-methodology-btn");
+      const closeModalBtnBottom = document.getElementById("close-methodology-btn-bottom");
+
+      function openModal() {
+        if (!modal) return;
+        modal.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+      }
+
+      openModalBtn?.addEventListener("click", openModal);
+      footerModalBtn?.addEventListener("click", openModal);
+      closeModalBtn?.addEventListener("click", closeModal);
+      closeModalBtnBottom?.addEventListener("click", closeModal);
+
+      modal?.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal && !modal.classList.contains("hidden")) {
+          closeModal();
+        }
+      });
+    </script>
+  </body>
+</html>

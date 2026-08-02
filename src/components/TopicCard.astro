@@ -1,0 +1,239 @@
+---
+interface Article {
+  topic: string;
+  gamma: number;
+  year: string;
+  topicLabel: string;
+  title: string;
+  abstract: string;
+  country?: string;
+}
+
+interface Topic {
+  topicLabel: string;
+  articleCount: number;
+  articles: Article[];
+}
+
+interface Props {
+  topic: Topic;
+  index: number;
+  categoryId?: string;
+}
+
+const { topic, index, categoryId = "all" } = Astro.props as Props;
+const panelId = `topic-panel-${categoryId}-${index}`;
+const maxGamma = topic.articles.length > 0 ? Math.max(...topic.articles.map((a) => a.gamma)) : 0;
+---
+
+<div
+  class="topic-card bg-white rounded-xl border border-gray-200 shadow-xs hover:border-gray-300 transition-all overflow-hidden"
+  data-topic-card
+  data-topic-label={topic.topicLabel.toLowerCase()}
+  data-article-count={topic.articleCount}
+  data-max-gamma={maxGamma}
+  data-search-text={`${topic.topicLabel} ${topic.articles.map((a) => `${a.title} ${a.year} ${a.country || ""} ${a.abstract}`).join(" ")}`.toLowerCase()}
+>
+  <button
+    type="button"
+    class="w-full px-5 py-4 flex items-center justify-between gap-4 text-left hover:bg-gray-50/80 transition-colors cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-orange focus-visible:ring-inset"
+    aria-expanded="false"
+    aria-controls={panelId}
+    data-accordion-trigger
+  >
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 flex-wrap mb-1">
+        <h3 class="text-base font-semibold text-navy group-hover:text-orange transition-colors">
+          {topic.topicLabel}
+        </h3>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-body/60 flex-wrap">
+        <span class="inline-flex items-center gap-1 font-medium text-navy/80 bg-gray-100 px-2 py-0.5 rounded-md">
+          <svg class="w-3.5 h-3.5 text-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          {topic.articleCount} paper{topic.articleCount !== 1 ? "s" : ""}
+        </span>
+        {maxGamma > 0 && (
+          <span class="font-mono text-xs text-orange bg-orange/10 px-2 py-0.5 rounded-md font-medium" title="Top document relevance probability in this topic">
+            Top γ: {maxGamma.toFixed(3)}
+          </span>
+        )}
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <span class="text-xs text-body/40 hidden sm:inline group-hover:text-body/70 transition-colors">
+        Toggle
+      </span>
+      <div class="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-orange/10 flex items-center justify-center transition-colors">
+        <svg
+          class="w-4 h-4 text-gray-500 group-hover:text-orange transition-transform duration-200"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2.5"
+          data-accordion-chevron
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+  </button>
+
+  <div id={panelId} class="hidden border-t border-gray-100 bg-offwhite/50" data-accordion-panel>
+    <ul class="divide-y divide-gray-100">
+      {topic.articles.map((article, aIdx) => {
+        const scholarUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(article.title)}`;
+        const hasLongAbstract = article.abstract.length > 160;
+
+        return (
+          <li class="p-5 hover:bg-white transition-colors bg-white/70">
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-2">
+              <h4 class="text-sm font-semibold text-navy leading-snug flex-1">
+                {article.title}
+              </h4>
+              <div class="flex items-center gap-1.5 shrink-0 self-start">
+                <a
+                  href={scholarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-navy/5 text-navy hover:bg-orange hover:text-white transition-all cursor-pointer no-underline"
+                  title="Search this paper on Google Scholar"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  <span>Scholar</span>
+                </a>
+                <button
+                  type="button"
+                  data-copy-title={article.title}
+                  class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-gray-100 text-body/70 hover:text-navy hover:bg-gray-200 transition-all cursor-pointer"
+                  title="Copy paper title to clipboard"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <span class="copy-text">Copy</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs mb-2.5">
+              <span class="font-mono text-orange bg-orange/10 px-2 py-0.5 rounded-md font-medium" title="Relevance probability: gamma score">
+                γ {article.gamma.toFixed(3)}
+              </span>
+              <span class="px-2 py-0.5 rounded-md bg-gray-100 text-body/70 font-medium font-mono">
+                {article.year}
+              </span>
+              {article.country && (
+                <span class={[
+                  "px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider",
+                  article.country.toLowerCase().includes("china") || article.country.toLowerCase().includes("cn")
+                    ? "bg-rose-50 text-rose-700 border border-rose-200"
+                    : "bg-blue-50 text-blue-700 border border-blue-200"
+                ].join(" ")}>
+                  {article.country}
+                </span>
+              )}
+            </div>
+
+            {article.abstract && (
+              <div class="text-xs text-body/70 leading-relaxed mt-1">
+                <p class="abstract-content line-clamp-3" data-abstract-text>
+                  {article.abstract}
+                </p>
+                {hasLongAbstract && (
+                  <button
+                    type="button"
+                    class="mt-1.5 text-xs font-semibold text-orange hover:text-orange-dark cursor-pointer inline-flex items-center gap-1 transition-colors"
+                    data-abstract-toggle
+                  >
+                    <span>Read full abstract</span>
+                    <svg class="w-3 h-3 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</div>
+
+<script>
+  // Accordion toggle handler
+  document.querySelectorAll<HTMLButtonElement>("[data-accordion-trigger]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const controlsId = btn.getAttribute("aria-controls");
+      const card = btn.closest("[data-topic-card]");
+      const panel = controlsId ? document.getElementById(controlsId) : card?.querySelector<HTMLElement>("[data-accordion-panel]");
+      const chevron = btn.querySelector<SVGElement>("[data-accordion-chevron]");
+      if (!panel) return;
+
+      const isOpen = !panel.classList.contains("hidden");
+      if (isOpen) {
+        panel.classList.add("hidden");
+        btn.setAttribute("aria-expanded", "false");
+        chevron?.classList.remove("rotate-180");
+      } else {
+        panel.classList.remove("hidden");
+        btn.setAttribute("aria-expanded", "true");
+        chevron?.classList.add("rotate-180");
+      }
+    });
+  });
+
+  // Abstract expand/collapse toggle
+  document.querySelectorAll<HTMLButtonElement>("[data-abstract-toggle]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const parent = btn.parentElement;
+      const textElem = parent?.querySelector<HTMLElement>("[data-abstract-text]");
+      const label = btn.querySelector<HTMLSpanElement>("span");
+      const icon = btn.querySelector<SVGElement>("svg");
+
+      if (textElem) {
+        const isClamped = textElem.classList.contains("line-clamp-3");
+        if (isClamped) {
+          textElem.classList.remove("line-clamp-3");
+          textElem.classList.add("line-clamp-none");
+          if (label) label.textContent = "Show less";
+          icon?.classList.add("rotate-180");
+        } else {
+          textElem.classList.remove("line-clamp-none");
+          textElem.classList.add("line-clamp-3");
+          if (label) label.textContent = "Read full abstract";
+          icon?.classList.remove("rotate-180");
+        }
+      }
+    });
+  });
+
+  // Copy title button
+  document.querySelectorAll<HTMLButtonElement>("[data-copy-title]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const textToCopy = btn.dataset.copyTitle;
+      const label = btn.querySelector<HTMLSpanElement>(".copy-text");
+      if (!textToCopy) return;
+
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        if (label) {
+          const original = label.textContent;
+          label.textContent = "Copied! ✓";
+          btn.classList.add("bg-emerald-100", "text-emerald-800");
+          setTimeout(() => {
+            label.textContent = original;
+            btn.classList.remove("bg-emerald-100", "text-emerald-800");
+          }, 1800);
+        }
+      } catch (err) {
+        console.error("Clipboard copy failed", err);
+      }
+    });
+  });
+</script>

@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-body bg-offwhite antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply text-navy font-semibold leading-tight;
+  }
+
+  ::selection {
+    @apply bg-orange/20 text-navy;
+  }
+}
+
+@layer utilities {
+  .line-clamp-none {
+    -webkit-line-clamp: unset !important;
+    display: block !important;
+  }
+}

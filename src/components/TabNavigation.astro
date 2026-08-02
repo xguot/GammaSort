@@ -1,0 +1,93 @@
+---
+interface Tab {
+  id: string;
+  label: string;
+  count?: number;
+}
+
+const { tabs, activeTab } = Astro.props as {
+  tabs: Tab[];
+  activeTab: string;
+};
+---
+
+<nav
+  id="tab-navigation-root"
+  class="flex border-b border-gray-200 bg-white rounded-t-xl overflow-x-auto no-scrollbar shadow-xs"
+  role="tablist"
+  aria-label="Category tabs"
+>
+  {tabs.map((tab) => {
+    const isActive = tab.id === activeTab;
+    return (
+      <button
+        type="button"
+        role="tab"
+        id={`tab-btn-${tab.id}`}
+        aria-controls={`category-panel-${tab.id}`}
+        aria-selected={isActive ? "true" : "false"}
+        tabindex={isActive ? 0 : -1}
+        data-tab={tab.id}
+        class={[
+          "flex items-center gap-2.5 px-5 py-4 text-sm font-semibold border-b-2 transition-all whitespace-nowrap cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-orange focus-visible:ring-inset",
+          isActive
+            ? "border-orange text-orange bg-orange/5"
+            : "border-transparent text-body/60 hover:text-navy hover:bg-gray-50 hover:border-gray-300",
+        ].join(" ")}
+      >
+        <span>{tab.label}</span>
+        {tab.count !== undefined && (
+          <span
+            data-tab-count={tab.id}
+            class={[
+              "text-xs px-2 py-0.5 rounded-full font-mono font-medium transition-colors",
+              isActive
+                ? "bg-orange text-white"
+                : "bg-gray-100 text-body/60 group-hover:bg-gray-200",
+            ].join(" ")}
+          >
+            {tab.count}
+          </span>
+        )}
+      </button>
+    );
+  })}
+</nav>
+
+<script>
+  const tabButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+
+  function selectTab(btn: HTMLButtonElement) {
+    const tabId = btn.dataset.tab;
+    if (tabId) {
+      window.dispatchEvent(new CustomEvent("tab-change", { detail: { tabId } }));
+      if (window.location.hash !== `#${tabId}`) {
+        history.replaceState(null, "", `#${tabId}`);
+      }
+    }
+  }
+
+  tabButtons.forEach((btn, index) => {
+    btn.addEventListener("click", () => selectTab(btn));
+
+    // WAI-ARIA Keyboard navigation
+    btn.addEventListener("keydown", (e) => {
+      let targetIndex = -1;
+      if (e.key === "ArrowRight") {
+        targetIndex = (index + 1) % tabButtons.length;
+      } else if (e.key === "ArrowLeft") {
+        targetIndex = (index - 1 + tabButtons.length) % tabButtons.length;
+      } else if (e.key === "Home") {
+        targetIndex = 0;
+      } else if (e.key === "End") {
+        targetIndex = tabButtons.length - 1;
+      }
+
+      if (targetIndex >= 0) {
+        e.preventDefault();
+        tabButtons[targetIndex].focus();
+        selectTab(tabButtons[targetIndex]);
+      }
+    });
+  });
+</script>

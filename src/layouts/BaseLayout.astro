@@ -14,6 +14,18 @@ const { title, description } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description || "GammaSort — Topic modeling explorer of US and Chinese academic papers"} />
+    <meta name="theme-color" content="#232D4B" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph / Social Media Meta -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} | GammaSort`} />
+    <meta property="og:description" content={description || "Explore topic modeling distributions of US and Chinese academic literature sorted by relevance score (γ)."} />
+    <meta property="og:site_name" content="GammaSort" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={`${title} | GammaSort`} />
+    <meta name="twitter:description" content={description || "Explore topic modeling distributions of US and Chinese academic literature sorted by relevance score (γ)."} />
 
     <title>{title} | GammaSort</title>
 
